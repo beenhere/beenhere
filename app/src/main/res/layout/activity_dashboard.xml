@@ -1,0 +1,151 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:alpha=".9"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".1"
+        android:background="#ffb93342"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight=".2">
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/imageView"
+                android:src="@drawable/logo_w"
+                android:padding="5dp"
+                android:background="#ffb91e58" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".02"
+            android:background="@drawable/background_shadow"
+            android:id="@+id/linearLayout21" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight=".6"
+            android:id="@+id/linearLayout" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="BeenHere Map"
+                android:id="@+id/textView"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_vertical|center_horizontal"
+                android:textColor="#ffffffff"
+                android:textSize="25dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight=".2"
+            android:id="@+id/linearLayout2" >
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/imageView2"
+                android:src="@drawable/logo_w"
+                android:padding="5dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".05"
+        android:background="#ff1a568e"
+        android:weightSum="1"
+        android:id="@+id/linearLayout4" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Find safe places from the stories been there...."
+            android:id="@+id/textView2"
+            android:layout_weight=".7"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#ffffffff" />
+
+    </LinearLayout>
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_weight=".7" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".15"
+        android:background="#ffb93342"
+        android:weightSum="1"
+        android:id="@+id/linearLayout3" >
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:weightSum="1"
+            android:layout_weight=".75">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_weight=".4"
+                android:id="@+id/linearLayout5"
+                android:background="@drawable/triangle">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imgPost"
+                    android:src="@drawable/plainpin"
+                    android:padding="7dp"
+                    android:layout_gravity="center_horizontal" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:text="Post Your Story"
+            android:id="@+id/textView3"
+            android:layout_weight=".3"
+            android:gravity="center_horizontal"
+            android:textColor="#ffffffff" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,388 @@
+package com.sakana.beenhere;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.sakana.beenhere.ui.BLHttp;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+public class DashboardActivity extends Activity implements View.OnClickListener,LocationListener {
+
+    public static GoogleMap googleMap; // Might be null if Google Play services APK is not available.
+    LocationManager locationManager;
+    Location myLocation;
+    double latitude;
+    double longitude;
+    LatLng latfrom;
+    private static final String URL_POST = "http://"+ Class_Declarations.ipAddress+"/beenhere/beenhere_api/get_post.php?token=asdasd&";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_dashboard);
+        setUpMapIfNeeded();
+      BLHttp retailers = new BLHttp(postData,this);
+        Log.d(URL_POST, "right");
+        retailers.execute(URL_POST);
+
+        findViewById(R.id.imgPost).setOnClickListener(this);
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setUpMapIfNeeded();
+        BLHttp retailers = new BLHttp(postData,this);
+        Log.d(URL_POST, "right");
+        retailers.execute(URL_POST);
+    }
+
+    private void setUpMap() {
+      //  googleMap.addMarker(new MarkerOptions().position(new LatLng(14.558322, 121.018137)).title("Marker"));
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        // Create a criteria object to retrieve provider
+        Criteria criteria = new Criteria();
+
+        // Get the name of the best provider
+        String provider = locationManager.getBestProvider(criteria, false);
+
+        // Get Current Location
+        myLocation = locationManager.getLastKnownLocation(provider);
+        if (myLocation != null) {
+
+            // Get latitude of the current location
+            latitude = myLocation.getLatitude();
+
+            // Get longitude of the current location
+            longitude = myLocation.getLongitude();
+
+            latfrom = new LatLng(latitude, longitude);
+
+        } else {
+            locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    0,
+                    0 , (android.location.LocationListener) this);
+
+            // Define a listener that responds to location updates
+
+        }
+
+        LatLng latLng = new LatLng(latitude, longitude);
+        // Create a LatLng object for the current location
+
+        latfrom = new LatLng(latitude, longitude);
+        // Show the current location in Google Map
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+        // Zoom in the Google Map
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        // googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        // googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        // googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        // googleMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+
+        // Showing / hiding your current location
+        googleMap.setMyLocationEnabled(true);
+
+        // Enable / Disable zooming controls
+//        googleMap.getUiSettings().setZoomControlsEnabled(false);
+
+        // Enable / Disable my location button
+        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        // Enable / Disable Compass icon
+        googleMap.getUiSettings().setCompassEnabled(true);
+
+        // Enable / Disable Rotate gesture
+        googleMap.getUiSettings().setRotateGesturesEnabled(true);
+
+        // Enable / Disable zooming functionality
+        googleMap.getUiSettings().setZoomGesturesEnabled(true);
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+//                Intent intent = new Intent(getActivity(), FullScreenMap.class);
+                //                intent.putExtra("Lat", point.latitude);
+//                intent.putExtra("Lon", point.longitude);
+////                Toast.makeText(getActivity(), point.latitude +" "+ point.longitude , Toast.LENGTH_LONG).show();
+//                intent.putExtra("mobile", getActivity().getIntent().getExtras().getString("mobile"));
+//
+//                startActivity(intent);
+
+
+            }
+        });
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Toast.makeText(DashboardActivity.this, "Enabled new provider " + provider,
+                Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(DashboardActivity.this, "Disabled provider " + provider,
+                Toast.LENGTH_SHORT).show();
+    }
+
+
+
+    /**
+     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
+     * installed) and the map has not already been instantiated.. This will ensure that we only ever
+     * call {@link #setUpMap()} once when {@link #googleMap} is not null.
+     * <p>
+     * If it isn't installed {@link SupportMapFragment} (and
+     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
+     * install/update the Google Play services APK on their device.
+     * <p>
+     * A user can return to this FragmentActivity after following the prompt and correctly
+     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
+     * have been completely destroyed during this process (it is likely that it would only be
+     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
+     * method in {@link #onResume()} to guarantee that it will be called.
+     */
+    private void setUpMapIfNeeded() {
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (googleMap == null) {
+            // Try to obtain the map from the SupportMapFragment.
+            MapFragment mMap = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+            googleMap= mMap.getMap();
+            // Check if we were successful in obtaining the map.
+            if (googleMap != null) {
+                setUpMap();
+            //    centerMapOnMyLocation();
+
+            }
+        }
+    }
+
+    /**
+     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
+     * just add a marker near Africa.
+     * <p>
+     * This should only be called once and when we are sure that {@link #googleMap} is not null.
+     */
+
+
+
+    private Runnable postData = new Runnable() {
+        @Override
+        public void run() {
+
+
+            System.out.println(BLHttp.apiResult);
+            if(BLHttp.apiResult.equals("URL not available")){
+
+            }else{
+                try {
+                    int profday = 0;
+                    int profday2 = 0;
+                    JSONArray posts = new JSONObject(BLHttp.apiResult).getJSONArray("Posts");
+
+                    for (int i = 0; i < posts.length(); i++) {
+                        final JSONObject e = posts.getJSONObject(i);
+
+
+                        try {
+                            SimpleDateFormat simpleDateFormatx = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            Date profdate = simpleDateFormatx.parse(e.getString("Post_Date"));
+
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(profdate);
+                            profday = cal.get(Calendar.DAY_OF_WEEK);
+
+                            Calendar cal2 = Calendar.getInstance();
+                            cal2.add(Calendar.DAY_OF_MONTH, 3);
+                            profday2 = cal2.get(Calendar.DAY_OF_WEEK);
+
+
+
+                            //Toast.makeText(DashboardActivity.this,String.valueOf(profday) + " == " + String.valueOf(daythis) ,Toast.LENGTH_SHORT).show();
+                        }
+                        catch (ParseException ex)
+                        {
+
+                        }
+
+                        String rlon = e.getString("Long");
+                        String rlat = e.getString("Lat");
+
+
+                        if ((!rlon.equals("")) || (!rlat.equals(""))) {
+                            Double lon = Double.parseDouble(e.getString("Long"));
+                            Double lat = Double.parseDouble(e.getString("Lat"));
+                            MarkerOptions marker;
+
+                            String markerMsg=e.getString("Post_Description");
+
+
+
+                            if (markerMsg.length()>10){
+                                markerMsg=e.getString("Post_Description").substring(0,10)+"...";
+                            }
+
+
+                            marker = new MarkerOptions().position(new LatLng(lat, lon)).title(markerMsg);
+
+
+                            String Post_Type;
+                            Post_Type=e.getString("Post_Type");
+
+
+                            Marker locationFlag;
+                      //      locationFlag= googleMap.addMarker(marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.pin)));
+                            if (Post_Type.equals("1"))
+                            {
+                                locationFlag= googleMap.addMarker(marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.safepin)));
+                            }else
+                            {
+                                locationFlag= googleMap.addMarker(marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.dangerpin)));
+                            }
+
+
+                            //Toast.makeText(DashboardActivity.this,marker.getTitle(),Toast.LENGTH_SHORT).show();
+                            locationFlag.showInfoWindow();
+
+                            googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                @Override
+                                public boolean onMarkerClick(Marker marker) {
+
+                                    try {
+                                        Class_Declarations.complete_name=e.getString("UserName");
+                                        Class_Declarations.post_description=e.getString("Post_Description");
+                                        Class_Declarations.post_date=e.getString("Post_Date");
+                                        Class_Declarations.post_type=e.getString("Post_Type");
+
+
+
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+
+
+                                    Intent ii = new Intent(new Intent(DashboardActivity.this, ViewStoryActivity.class));
+                                      startActivity(ii);
+
+
+
+                                    return false;
+                                }
+                            });
+
+
+                        }
+
+
+
+
+
+
+
+
+
+                    }
+
+
+//                final SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, contactList , R.layout.retailer_list,
+//                        new String[] { "name", "address","long","lang","mobile" },
+//                        new int[] { R.id.contactName, R.id.contactAddress, R.id.contactLong, R.id.contactLat, R.id.contactMobile });
+
+//
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    };
+
+
+    private void centerMapOnMyLocation() {
+        googleMap.setMyLocationEnabled(true);
+        myLocation=googleMap.getMyLocation();
+        LatLng loc = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+
+        if(googleMap != null){
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
+        }
+    }
+
+
+    @Override
+    public void onClick(View v) {
+
+
+        switch (v.getId())
+        {
+
+            case R.id.imgPost:
+
+
+                Intent ii = new Intent(new Intent(DashboardActivity.this, PostActivity.class));
+
+                startActivity(ii);
+
+                break;
+
+
+
+
+        }
+
+
+
+
+    }
+}
